@@ -5,13 +5,14 @@ const res = require('express/lib/response');
 const app = express();
 const fs = require('fs');
 const multer = require('multer');
-const {TesseractWorker} = require('tesseract.js');
-const worker = new TesseractWorker();
+// const {TesseractWorker} = require('tesseract.js');
+// const worker = new TesseractWorker();
+const createWorker = require("tesseract.js");
 
 const storage = multer.diskStorage({
     destination: (req, file,cb) => {
         cb(null, "./uploads");
-    },s
+    },
     filename: (res, file, cb) => {
         cb(null, file.originalname);
     }
@@ -33,8 +34,8 @@ app.post("/upload", (req, res) => {
         fs.readFile(`./uploads/${req.file.originalname}`, (err, Data) => {
             if(err) return console.log('This is your error', err);
 
-            worker
-            .recongnize(Data, "eng", {tessjs_Create_pdf: '1'})
+            createWorker
+            .recongnize(Data, "tam", {tessjs_Create_pdf: '1'})
             .progress(progress => {
                 console.log(progress);
             })
@@ -42,7 +43,7 @@ app.post("/upload", (req, res) => {
                 // res.send(result.text);
                 res.redirect('.download')
             })
-            .finally(() => worker.terminate());
+            .finally(() => createWorker.terminate());
         });
     });
 });
